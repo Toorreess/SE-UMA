@@ -1,0 +1,78 @@
+reset
+
+!new Parque ('Tivoli')
+
+!new Operario ('Manuel')
+!set Manuel.ocupado:= false
+
+!new Dispositivo ('DispManu')
+!set DispManu.avisosResueltos:=0
+!new CRA ('CRA')
+
+!new Noria ('N1')
+!set N1.calle:= 'TivoliUno'
+!set N1.hayAveria:= true
+!set N1.enMovimiento:= false
+
+!new Vehiculo ('Vehic0')
+!set Vehic0.bienAnclado:=true
+!set Vehic0.numero:=0
+!set Vehic0.senyalSolicitud:=false
+!set Vehic0.enReparacion:=false
+
+!new Vehiculo ('Vehic1')
+!set Vehic1.bienAnclado:=false
+!set Vehic1.numero:=1
+!set Vehic1.senyalSolicitud:=false
+!set Vehic1.enReparacion:=false
+
+!new Vehiculo ('Vehic2')
+!set Vehic2.bienAnclado:=true
+!set Vehic2.numero:=2
+!set Vehic2.senyalSolicitud:=false
+!set Vehic2.enReparacion:=false
+
+!new DetectorVehiculo ('DVehic0')
+!set DVehic0.hayFallo:=false
+
+!new DetectorVehiculo ('DVehic1')
+!set DVehic1.hayFallo:=true
+
+!new DetectorVehiculo ('DVehic2')
+!set DVehic0.hayFallo:=false
+
+!new MontanyaRusa ('M1')
+!set M1.calle:= 'TivoliDos'
+!set M1.hayAveria:= false
+!set M1.enMovimiento:= true
+
+!new Vagon ('Vagon0')
+!set Vagon0.bienAnclado:=true
+!set Vagon0.numero:=0
+!set Vagon0.senyalSolicitud:=false
+!set Vagon0.enReparacion:=false
+
+!new Vagon ('Vagon1')
+!set Vagon1.bienAnclado:=true
+!set Vagon1.numero:=1
+!set Vagon1.senyalSolicitud:=false
+!set Vagon1.enReparacion:=false
+
+!new Vagon ('Vagon2')
+!set Vagon2.bienAnclado:=true
+!set Vagon2.numero:=2
+!set Vagon2.senyalSolicitud:=false
+!set Vagon2.enReparacion:=false
+
+!new DetectorVagon ('DVagon0')
+!set DVagon0.hayFallo:=false
+
+!new DetectorVagon ('DVagon1')
+!set DVagon1.hayFallo:=false
+
+!new DetectorVagon ('DVagon2')
+!set DVagon2.hayFallo:=false
+
+
+
+
