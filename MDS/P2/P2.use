@@ -1,0 +1,141 @@
+model P2
+
+--CLASES
+class Parque
+end
+
+class Operario
+ attributes
+  ocupado:Boolean
+end
+
+class Dispositivo
+ attributes
+  avisosResueltos:Integer
+
+ operations
+  -- aumentaAvisos()
+  -- begin
+  -- self.avisosResueltos := self.avisosResueltos+1
+  -- end
+  -- pre:
+  -- post: self.avisosResueltos = self.avisosResueltos@pre +1
+end
+
+class CRA
+ operations
+  recibeAviso()
+end
+
+abstract class Atraccion
+ attributes
+  calle:String
+  hayAveria:Boolean
+  enMovimiento:Boolean
+end
+
+class MontanyaRusa < Atraccion
+end
+
+class Noria < Atraccion
+end
+
+abstract class Componente
+ attributes
+  bienAnclado:Boolean
+  numero:Integer
+  senyalSolicitud:Boolean
+  enReparacion:Boolean
+end
+
+class Vagon < Componente
+end
+
+class Vehiculo <Componente
+end
+
+class DetectorVagon
+ attributes
+  hayFallo:Boolean
+
+end
+
+class DetectorVehiculo
+ attributes
+  hayFallo:Boolean
+end
+
+
+--ASOCIACIONES
+composition Posesion between 
+ Parque [1] role miParque
+ Atraccion [1..*] role misAtracciones
+end
+
+aggregation Trabajo between
+ Parque[1] role miParque
+ Operario [1..*] role trabajador
+end
+
+association Control between
+ Operario [1] role trabajador
+ Dispositivo [1] role miDispositivo
+end
+
+association Aviso between
+ Dispositivo [1..*] role miDispositivo
+ CRA [1] role central
+end
+
+aggregation VagonDe between
+ MontanyaRusa [1] role montanya 
+ Vagon [1..*] role unVagon
+end
+
+aggregation VehiculoDe between
+ Noria [1] role noria 
+ Vehiculo [1..*] role unVehiculo
+end
+
+association Posicion between
+ Vagon [0..1] role anterior
+ Vagon [0..1] role posterior
+end
+
+composition DetectorM between
+ Vagon [1] role unVagon
+ DetectorVagon [1] role miDetectorM
+end
+
+composition DetectorN between
+ Vehiculo [1] role unVehiculo
+ DetectorVehiculo [1] role miDetectorN
+end
+
+association AvisoVehiculo between
+ CRA [1] role central
+ Vehiculo [0..*] role vehicAvisa
+end
+
+association AvisoVagon between
+ CRA [1] role central
+ Vagon [0..*] role vagonAvisa
+end
+ 
+
+constraints
+ 
+context Dispositivo inv AvisosNegativos:
+self.avisosResueltos>=0
+
+context Vagon inv NumeroVagonNeganivo:
+self.numero>=0
+
+context Vehiculo inv NumeroVehiculoNeganivo:
+self.numero>=0
+
+context Vehiculo inv ParadaAveriaNoria:
+self.enReparacion = true implies self.noria.enMovimiento = false
+
+context Vagon inv ParadaAveriaMontanya:
+self.enReparacion = true implies self.montanya.enMovimiento = false

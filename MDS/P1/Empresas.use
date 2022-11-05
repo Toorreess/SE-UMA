@@ -1,0 +1,160 @@
+model Empresas
+
+--CLASES
+class Empresa
+    attributes
+        pedidoMinimo:Real
+end
+
+class Empleado
+end
+
+enum Contratos {trabajadorBase, director, gerente}
+
+associationclass Contrato between
+    Empresa[1..3] role empresa
+    Empleado[3..*] role empleado
+    attributes
+        rolEmpleado:enum
+        salario:Real
+    
+end
+
+class Almacen
+end
+
+class Cliente
+end
+
+class VIP < Cliente
+    attributes
+        descuento:Integer
+end
+
+class Producto
+    attributes 
+        precio:Real
+end
+
+    --¿PROPIEDADES DERIVADAS?
+class Articulo
+    attributes
+        precio:Integer
+end
+
+class Pedido
+    attributes
+        precioAPagar:Real
+end
+
+
+--ASOCIACIONES(NOMBRAR Y REVISAR MULTIPLICITY)
+composition Almacenamiento between
+    Empresa[0..1] role Empresa
+    Almacen[1] role almacen
+end
+
+aggregation Existencias between
+    Almacen[1..*] role almacen
+    Articulo[1] role articulo
+end
+
+    --REVISAR MATERIALIZES
+association ProdArticulo between
+    Producto[*] role producto
+    Articulo[*] role articulo
+end
+
+aggregation ArticulosPedidos between
+    Articulo[1..*] role articulo
+    Pedido[1] role factura
+end
+
+composition Pertenencia between
+    Cliente[0..1] role cliente
+    Articulo[*] role articulo
+end
+
+association Pedidos between
+    Cliente[1] role cliente
+    Pedido[1..*] role factura
+end
+    
+association Clientes between
+    Cliente[*] role cliente
+    Empresa[1..*] role empresa
+end
+
+association Beneficiario between
+    VIP[1] role vip
+    Empleado[1] role empleado
+end
+
+aggregation Oferta between
+        Empresa[*] role empresa
+        Producto[1..*] role producto
+end
+--Expresiones OCL
+constraints
+
+--En una misma empresa los trabajadores base cobra menos que un gerente
+context Empresa inv trabajadorMenosGerente:
+self.trabajadorBase.salario->forAll(x | self.gerente.salario->forAll(y | x < y))
+
+--En una misma empresa el gerente cobra menos que un director
+context Empresa inv gerenteMenosDirector:
+self.gerente.salario->forAll(x | self.director.salario->forAll(y | x < y))
+
+-- En una misma empresa tiene que haber al menos un trabajador base
+context Empresa inv masUnEmpleado:
+self.trabajadorBase->asSet()->size()>1
+
+--En una misma empresa solo puede haber un gerente
+context Empresa inv soloUnGerente:
+self.gerente->asSet()->size()=1
+
+--En una misma empresa solo puede haber un director
+context Empresa inv soloUnDirector:
+self.director->asSet()->size()=1
+
+--Salarios no pueden ser negativos
+context Empleado inv trabajadorSalarioValido:
+Empleado.allInstances()->forAll(x | x.salario > 0)
+
+--Cada pedido tiene que superar un valor minimo impuesto por la empresa
+context Empresa inv superarMinimo:
+self.cliente->asSet()->forAll(x | x.factura->asSet()->forAll(y | y.precioAPagar > self.pedidoMinimo))
+
+-- Precio minimo de cada empresa tiene que ser valido
+context Empresa inv minimoValido:
+self.pedidoMinimo > 0
+
+-- Precio pedido tiene que ser valido
+context Pedido inv minimoPedido:
+self.precioAPagar > 0
+
+-- Tiene que haber al menos un articulo en el almacen de la empresa
+context Almacen inv alMenosUnArticulo:
+self.articulo->asSet()->size()>0
+
+-- El articulo o bien esta en el almacen o bien es propiedad del cliente comprado a través de un pedido
+context Articulo inv estaAlmacenOCliente:
+(self.oclIsKindOf(Cliente) and self.oclIsKindOf(Pedido)) xor self.oclIsKindOf(Almacen)
+
+-- Una persona no puede tener mas de 10 productos sin importar la empresa.
+context Cliente inv max10Productos:
+self.articulo->collect(producto)->asSet()->size<=10
+
+-- El precio de los productos tiene que ser valido
+context Producto inv precioValido:
+self.precio > 0
+
+-- Cuando un cliente quiere comprar un articulo tiene que haber existencias suficientes
+context Almacen inv ComprobarArticuloStock:
+Articulo.allInstances()->
+
+-- Un cliente es VIP cuando ha hecho pedidos por valor de 1000 euros
+context Cliente inv esVIP:
+self.factura->collect(precioAPagar)->sum() >= 1000 
+
+--if self.oclIsKindOf(VIP) -> then self.factura->asSet()->
