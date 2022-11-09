@@ -1,0 +1,47 @@
+MODELO CONCEPTUAL   ->	MODELO DISEÑO	<->	LENG. PROG
+(DOMINION PROBLEMA)	Dominio de la sol
+
+Herramientas disp.
+-Herencia (de implementación y de extensión)
+-Polimorfismo
+-Encapsulamiento (cada objeto tiene un estado q solo puede cambiar pasandole un mensaje, con atributos privados)
+-Dynamic Binding
+xClase asoc.
+
+Poca separacion entre modelo diseño y leng. prog
+
+(...)
+
+Usar constructore xabale
+
+
+HERENCIA
+Clases abstractas
+-Define una interfaz que no implementa totalmente.
+-Puede incluir atributos y metodos concretos.
+-Se representa en cursiva.
+
+Interfaces
+-Conjuntos de signaturas de operaciones públicas.
+-Se potencia la flexibilidad y extensibilidad
+-Permite sacar partido al polimorfismo.
+
+DIFERENCIAS ENTRE MATERIALIZACION E INTERFACES
+*Relacion entre producto y artículo: materialización (NO ES UNA HERENCIA, es una asociación)
+
+como pongas if(..) then return true; else return false; te mata
+MEJOR -> return condicion;
+
+DIAGRAMAS DE ESTADOS
+-Indican las distintas formas en que un objeto responde a un evento.
+	·Cada evento corresponde a una operacion de la clase
+
+-Estrategias de implementación
+	·Comportamiento condicional(muchos if-else's)
+	·Tablas de estados
+	·Patrón de diseño Estado
+
+EMPAQUETAMIENTO
+-Permite organizar elementos en grupos o paquetes.
+	·Hace los diagramas más fáciles de entender.
+	·Cualquier elemento puede ser empaquetado.

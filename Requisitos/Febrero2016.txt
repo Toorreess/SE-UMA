@@ -1,0 +1,47 @@
+1.- PARTICIPANTES Y USUARIOS
+Participantes:
+
+-BOE. Institución pública que proporciona el soporte informática para la 
+ publicación de los boletines del BORME.
+
+-Fundación Ciudadana Civia. Patrocinador del proyector. 
+ Organización interesada en que se pueda buscar información sobre empresa y
+ cargos.
+
+-Registro Mercantil/BORME. Institución pública que recopila y genera info
+ sobre empresas y cargos.
+
+-Empresas que aparecen el BORME.
+
+
+Actores:
+-Personas interesadas en conocer información sobre empresa y sus
+ cargos
+	
+-Administración del sistema. Perfil de gestión de la instalación concreta.
+Entre otras cosas, puede regenerar el sistema cuando se corrompa.
+
+REQUISITOS FUNCIONALES
+
+ADMINISTRACIÓN DEL SISTEMA
+Yo, como administrador, quiero poder hacer una instalación inicial del sistema.
+Yo, como administrador, quiero poder refrescar la instalación del sistema (cuando detecte corrupción en DB).
+El sistema actualizará periódicamente la información sobre los nuevos boletines.
+
+BÚSQUEDAS
+Yo, como usuario, quiero poder buscar datos de una empresa por nombre.
+Yo, como usuario, quiero poder buscar datos de una persona por nombre.
+Yo, como usuario, quiero poder ver unas listas iniciales de empresas y usuarios.
+Yo, como usuario, quiero que el sistema vaya sugiriendo resultados mientras voy escribiendo los datos de la búsqueda.
+Yo, como usuario, quiero poder ver información detallada de una empresa.
+Yo, como usuario, quiero poder ver información detallada de una persona, con su historial de cargos.
+Yo, como usuario, quiero poder exportar los datos de la consulta. La exportación podrá ser en diferentes foramtos (CSV, PDF, XLSX).
+
+SUSCRIPCIONES
+Yo, como usuario, quiero poder suscribirme a las actualizaciones de los datos de una empresa.
+Yo, como usuario, quiero poder anular mis suscripciones a las actualizaciones de los datos de una empresa.
+
+CALENDARIO
+Acceder al calendario.
+Yo, como usuario, quiero poder seleccionar una fecha en el calendario y visualizar los actos mercantiles de esa fecha.
+Yo, como usuario, quiero poder seleccionar una fecha en el calendario y visualizar la lista de boletines publicados ee día.

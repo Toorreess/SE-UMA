@@ -1,0 +1,102 @@
+model Empresas
+
+--CLASES
+class Empresa
+    attributes
+        nombre:String
+end
+abstract class Empleado
+    attributes
+        salario:Real
+        nombre:String
+end
+
+class TrabajadorBase < Empleado
+end
+
+class Gerente < Empleado
+end
+
+class Director < Empleado
+end
+
+class Almacen
+end
+
+class Cliente
+end
+
+class VIP < Cliente
+    attributes
+        descuento:Integer
+end
+
+class Producto
+    attributes 
+        precio:Real
+end
+
+    --¿PROPIEDADES DERIVADAS?
+class Articulo
+    attributes
+        cantidad:Integer
+end
+
+class Pedido
+    attributes
+        precioAPagar:Real
+end
+
+
+--ASOCIACIONES(NOMBRAR Y REVISAR MULTIPLICITY)
+composition Empresaalmacen between
+    Empresa[0..1] role empresa
+    Almacen[1] role almacen
+end
+
+aggregation TrabajaEn between
+    Empresa[1..3] role empresa
+    Director[1] role director
+    Gerente[1] role gerente
+    TrabajadorBase[1..*] role trabajadorBase1
+end
+
+aggregation ProductoAlmacen between
+    Almacen[1..*] role almacen
+    Producto[1] role producto
+end
+
+aggregation ArticAlmace between
+   Almacen[1..*] role almacen
+   Articulo[1] role articulo
+end
+    --REVISAR MATERIALIZES
+association ProdArticulo between
+    Producto[*] role producto   
+    Articulo[*] role articulo1
+end
+
+association Articpedido between
+    Articulo[1..*] role articulo
+    Pedido[1] role pedido
+end
+
+composition clientartic between
+    Cliente[0..1] role cliente
+    Articulo[*] role articulo
+end
+
+association clientpedido between
+    Cliente[1] role cliente
+    Pedido[1..*] role pedido
+end
+    --REVISAR MULTIPLICITY
+association clientempresa between
+    Cliente[1] role cliente
+    Empresa[1] role empresa
+end
+
+association VIPEmpleado between
+    VIP[1] role vip
+    Empleado[1] role empleado
+end
