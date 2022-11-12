@@ -1,0 +1,45 @@
+reset
+ 
+!new Clock( 'Reloj' )
+!Reloj.NOW := 1960
+!Reloj.started := true
+
+!new Community('Nipon')
+!Nipon.aJoven := 12
+!Nipon.aAdulto := 20 
+!Nipon.aAnciano := 65
+!Nipon.esperanzaVida := 84
+
+!insert (Nipon,Reloj) into Tiempo 
+
+!new PersonaAleatoria('Luca')
+!insert (Nipon,Luca) into Pertenencia 
+!Luca.nace()
+
+!new PersonaAceptadora('Jaime')
+!insert (Nipon,Jaime) into Pertenencia
+!Jaime.nace()
+
+!Reloj.pasoTiempo()
+!Reloj.pasoTiempo()
+!Reloj.pasoTiempo()
+!Reloj.pasoTiempo()
+!Reloj.pasoTiempo()
+!Reloj.pasoTiempo()
+!Reloj.pasoTiempo()
+!Reloj.pasoTiempo()
+!Reloj.pasoTiempo()
+!Reloj.pasoTiempo()
+!Reloj.pasoTiempo()
+!Reloj.pasoTiempo()
+!Reloj.pasoTiempo()
+!Reloj.pasoTiempo()
+!Reloj.pasoTiempo()
+!Reloj.pasoTiempo()
+!Reloj.pasoTiempo()
+!Reloj.pasoTiempo()
+!Reloj.pasoTiempo()
+!Reloj.pasoTiempo()
+!Reloj.pasoTiempo()
+
+!insert (Luca,Jaime) into intencionMatrimonio

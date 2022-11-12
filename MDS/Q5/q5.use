@@ -35,14 +35,18 @@ abstract class Person
   attributes
     birthYear:Integer
     deathYear:Integer
-    age:Integer derive = 
-    self.community.clock.NOW - self.birthYear
+    age:Integer init = 0
     isDead:Boolean derive=
     self.deathYear <> null
  
   operations
-    vacio()
+    inicializa()
     begin
+    end
+
+    nace()
+    begin
+      self.birthYear := self.community.clock.NOW;
     end
 
     cumple()
@@ -89,17 +93,17 @@ abstract class Person
     self.respuestaMatrimonio(self.pretendiente)
   end
   -- Consideramos que para que pida matrimonio a alguien tiene que tener una solo pretendiente que es su pareja
-  pre tieneUnaPareja: self.pretendiente->size() = 1
+  pre tieneUnaPareja: self.pretendido->size() = 1
   -- El que pide matrimonio tiene que tener la edad minima para poder casarse
   pre edadLegal: self.age >= self.community.aJoven
   -- Uno no puede casarse consigo mismo
-  pre autoCasarse: self.pretendiente <> self
+  pre autoCasarse: self.pretendido <> self
   
   respuestaMatrimonio(p: Person)
   begin
     if (p.oclIsTypeOf(PersonaAceptadora)) then 
       self.aceptaMatrimonio(p);
-    else if (p.oclIsTypeOf(PersonaAleatoria)) then
+    else if (p.oclIsTypeOf(PersonaRechazadora)) then
       self.rechazaMatrimonio(p);  
     else
       if (1.rand() < 0.5) then
@@ -161,25 +165,26 @@ abstract class Person
   psm transicionEdad
     states
       ms:initial
-      Inicio
+	  Nacer
       Ninyo[self.age < self.community.aJoven and self.isDead = false]
       Joven[self.age < self.community.aAdulto and self.age >= self.community.aJoven and self.isDead = false]
       Adulto[self.age < self.community.aAnciano and self.age >= self.community.aAdulto and self.isDead = false]
       Mayor[self.age >= self.community.aAnciano and self.isDead = false]
+      Fallecido:final [self.isDead]
     transitions
-      ms->Inicio
-      Inicio->Ninyo {[self.age < self.community.aJoven]vacio()}
-      Inicio->Joven {[self.age < self.community.aAdulto and self.age >= self.community.aJoven]vacio()}
-      Inicio->Adulto {[self.age < self.community.aAnciano and self.age >= self.community.aAdulto]vacio()}
-      Inicio->Mayor {[self.age >= self.community.aAnciano]vacio()}
-
+      ms->Nacer
+	  Nacer->Ninyo {[self.age < self.community.aJoven]cumple()}
       Ninyo->Ninyo{[self.age + 1 < self.community.aJoven]cumple()}
       Ninyo->Joven{[self.age +1  >= self.community.aJoven]cumple()}
+      Ninyo->Fallecido{[self.isDead]muerte()}
       Joven->Joven{[self.age + 1 < self.community.aAdulto]cumple()}
       Joven->Adulto{[self.age + 1 >= self.community.aAdulto]cumple()}
+      Joven->Fallecido{[self.isDead]muerte()}
       Adulto->Adulto{[self.age + 1 < self.community.aAnciano]cumple()}
       Adulto->Mayor{[self.age + 1 >= self.community.aAnciano]cumple()}
+      Adulto->Fallecido{[self.isDead]muerte()}
       Mayor->Mayor{[self.age + 1 < self.community.esperanzaVida]cumple()}
+      Mayor->Fallecido{[self.isDead]muerte()}
   end
 
   psm transicionEstadoCivil
@@ -195,16 +200,7 @@ abstract class Person
       Fallecido :final[self.isDead]
     transitions
       ms->Inicio
-      Inicio->Soltero{[self.marriages() = 0 and self.isMarried() = false]vacio()}
-      Inicio->Casado{[self.isMarried()]vacio()}
-      Inicio->Divorciado{[self.marriages() > 0 and self.isMarried() = false]vacio()}
-      Inicio->Viudo{[self.marriages()>0 and self.husband -> select(m | self.husband
-      -> forAll(h | h.startYear<=m.startYear) and m.husband.isDead and m.endYear=
-      m.husband.deathYear) -> size() + self.wife -> select(m | self.wife -> forAll(w |
-      w.startYear<=m.startYear) and m.wife.isDead and m.endYear= m.wife.deathYear) ->
-      size() > 0 ]vacio()}
-      Inicio->Fallecido{[self.isDead]muerte()}
-
+	  Inicio->Soltero{[self.isMarried()=false]cumple()}
       Soltero->Soltero{[self.isMarried() = false]cumple()}
       Soltero->Casado{[self.oclInState(Casado)] aceptaMatrimonio()}
       Soltero->Fallecido{[self.isDead]muerte()}

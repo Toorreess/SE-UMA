@@ -1,0 +1,46 @@
+ACTORES PRINCIPALES
+-Clientes. Compran productos.
+Reponedores. Mantienen la máquina.
+
+REQUISITOS FUNCIONALES
+RF01. El cliente puede comprar un producto.
+RF02. El cliente puede consultar el precio de un producto.
+	
+	ACCIONES
+		Se muestra por pantalla el dinero en efectivo acumulado.
+		Cuando el cliente introduzca suficiente dinero, debe salir un producto.
+		El cliente puede obtener el dinero de vuelta.
+		La maquina si no dispensa el producto devuelve el dinero.
+		Si mete más dinero de lo que vale el producto, la máquina devuelve el cambio.
+		El cliente puede cancelar la compra.
+
+RF03. El reponedor puede poner nuevos productos.
+RF04. El reponedor puede modificar el precio de los productos.
+RF05. La maquina se puede poner fuera de servicio a sí misma si detecta una avería.
+RF06. La maquina envia los avisos al reponedor si le falta un producto.
+
+
+CASO DE USO "El cliente compra un producto"
+Pre-condición: 
+	El cliente debe haber introducido suficiente dinero.
+	El cliente debe haber seleccionado el código del producto.
+	Debe haber suficientes unidades del producto.
+
+Post-condición:
+	El cliente debe haber recibido el producto.
+	El cliente debe haber recibido el cambio si hubiese introducido más dinero de lo que cuesta el producto.
+
+Prioridad: Alta
+
+Escenario principal
+	1. El cliente teclea el código del producto.
+	1. La máquina muestra por pantalla el precio del producto.
+	3. El cliente introduce suficiente dinero para pagar el producto.
+	4. La máquina dispensa el producto.
+	5. La máquina da el cambio al cliente si fuera necesario.
+	
+Escenario alternativo.
+	1b. El cliente introduce dinero suficiente para el producto que desea.
+	2b. El cliente teclea el código del producto.
+	3b. La maquina dispensa el producto.
+

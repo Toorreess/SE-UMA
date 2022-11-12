@@ -2,11 +2,52 @@ model P2
 
 --CLASES
 class Parque
+  operations
+    hayOperariosDisponible(): Boolean =
+      self.trabajador->select(t | t.ocupado = true)->size() > 0
 end
 
 class Operario
- attributes
-  ocupado:Boolean
+	attributes
+		ocupado:Boolean
+	operations
+		
+		mandaOperarioReparar(calle: String, num: Integer)
+		begin
+			setOcupado()
+			self.miParque.misAtracciones->select(a | a.calle = calle)->asOrderedSet()->first().tipoComponente-> 
+			 select(c| c.numero = num)->asOrderedSet()->first().arreglarComponente();
+			setLibre()
+	    end
+		pre: self.ocupado = true
+		post: self.ocupado = false
+	
+
+		setOcupado()
+		begin
+			self.ocupado=true
+		end
+		pre: self.ocupado = false
+		post: self.ocupado = true
+
+
+		setLibre()
+		begin
+			self.ocupado = false
+		end
+		pre: self.ocupado = true
+		post: self.ocupado = false
+
+	statemachines
+		psm	transicionTrabajo
+		states
+			ms:initial
+			Libre[self.ocupado = false]
+			Ocupado[self.ocupado = true]
+		transitions
+			ms->Libre
+			Libre->Ocupado{[self.ocupado = true] mandaOperarioReparar()}
+
 end
 
 class Dispositivo
@@ -14,24 +55,57 @@ class Dispositivo
   avisosResueltos:Integer
 
  operations
-  -- aumentaAvisos()
-  -- begin
-  -- self.avisosResueltos := self.avisosResueltos+1
-  -- end
-  -- pre:
-  -- post: self.avisosResueltos = self.avisosResueltos@pre +1
+  aumentaAvisos()
+  begin
+    self.avisosResueltos := self.avisosResueltos+1
+  end
+  pre: self.avisosResueltos >= 0
+  post: self.avisosResueltos = self.avisosResueltos@pre +1
+
+  AvisoDispositivo(calle: String, num: Integer)
+  begin
+    self.trabajador.ocupado := true;
+    self.trabajador.mandaOperarioReparar(calle, num);
+  end
+  pre: self.trabajador.ocupado = false
+  post: self.trabajador.ocupado = true
 end
 
 class CRA
  operations
-  recibeAviso()
+  recibeAvisoCRA(calle: String, num: Integer, com: Componente)
+  begin
+    if(self.miParque->asOrderedSet()->first().hayOperariosDisponible()) then
+      self.miDispositivo->select(d| d.trabajador.ocupado = false)->asOrderedSet()->first().AvisoDispositivo(calle, num);
+    else
+      com.activaSenyalSolicitud();
+    end
+  end
 end
 
 abstract class Atraccion
- attributes
-  calle:String
-  hayAveria:Boolean
-  enMovimiento:Boolean
+  attributes
+    calle:String
+    hayAveria:Boolean
+    enMovimiento:Boolean
+  operations
+    hayFallos(): Boolean =
+      self.tipoComponente->select(c| c.bienAnclado = false and c.senyalSolicitud = true)->asOrderedSet()->size() = 0
+    
+    recibeAvisoAtraccion()
+    begin
+      self.hayAveria := true;
+      self.enMovimiento := false;
+    end
+    pre: true
+    post: self.hayAveria = true and self.enMovimiento = false
+
+    ponerEnMovimiento()
+    begin
+      self.enMovimiento := true
+    end
+    pre: self.enMovimiento = false
+    post: self.enMovimiento = true
 end
 
 class MontanyaRusa < Atraccion
@@ -41,11 +115,43 @@ class Noria < Atraccion
 end
 
 abstract class Componente
- attributes
-  bienAnclado:Boolean
-  numero:Integer
-  senyalSolicitud:Boolean
-  enReparacion:Boolean
+  attributes
+    bienAnclado:Boolean
+    numero:Integer
+    senyalSolicitud:Boolean
+    enReparacion:Boolean
+
+  operations
+    mandaAviso()
+    begin
+      self.tipoAtraccion.recibeAvisoAtraccion();
+      self.central.recibeAvisoCRA(self.tipoAtraccion.calle, self.numero, self);
+    end
+    pre: self.bienAnclado = false
+    post: true
+
+    activaSenyalSolicitud()
+    begin
+      self.senyalSolicitud := true
+    end
+    pre: self.senyalSolicitud = false
+    post: self.senyalSolicitud = true
+
+    arreglarComponente()
+    begin
+      self.enReparacion := false;
+      self.senyalSolicitud := false;
+      self.bienAnclado := true;
+      if (self.tipoAtraccion.hayFallos() = false) then
+        self.tipoAtraccion.ponerEnMovimiento()
+      end
+    end
+    pre: self.enReparacion = true
+    pre: self.bienAnclado = false
+    post: self.enReparacion = false
+    post: self.senyalSolicitud = false
+    post: self.bienAnclado = true
+
 end
 
 class Vagon < Componente
@@ -55,14 +161,33 @@ class Vehiculo <Componente
 end
 
 class DetectorVagon
- attributes
-  hayFallo:Boolean
+  attributes
+    hayFallo:Boolean
+  operations
+    tieneFalloVagon(): Boolean = self.hayFallo = true
 
+    generaFalloVagon()
+    begin
+      self.hayFallo := true;
+      self.unVagon.mandaAviso();
+    end
+    pre: self.hayFallo = false
+    post: self.hayFallo = true
 end
 
 class DetectorVehiculo
- attributes
-  hayFallo:Boolean
+  attributes
+    hayFallo:Boolean
+  operations
+    tieneFalloVehiculo(): Boolean = self.hayFallo = true
+
+    generaFalloVehiculo()
+    begin
+      self.hayFallo := true;
+      self.unVehiculo.mandaAviso();
+    end
+    pre: self.hayFallo = false
+    post: self.hayFallo = true
 end
 
 
@@ -87,15 +212,11 @@ association Aviso between
  CRA [1] role central
 end
 
-aggregation VagonDe between
- MontanyaRusa [1] role montanya 
- Vagon [1..*] role unVagon
+aggregation ComponenteDe between
+ Atraccion [1] role tipoAtraccion 
+ Componente [1..*] role tipoComponente
 end
 
-aggregation VehiculoDe between
- Noria [1] role noria 
- Vehiculo [1..*] role unVehiculo
-end
 
 association Posicion between
  Vagon [0..1] role anterior
@@ -112,30 +233,46 @@ composition DetectorN between
  DetectorVehiculo [1] role miDetectorN
 end
 
-association AvisoVehiculo between
+association AvisoCRA between
  CRA [1] role central
- Vehiculo [0..*] role vehicAvisa
+ Componente [0..*] role componente
 end
 
-association AvisoVagon between
- CRA [1] role central
- Vagon [0..*] role vagonAvisa
+association AvisoDispositivo between
+ Dispositivo [1] role dispositivo
+ Componente [0..*] role componente
 end
- 
+
+association ParqueCRA between
+  CRA [1] role central
+  Parque [1] role miParque
+end
 
 constraints
- 
-context Dispositivo inv AvisosNegativos:
-self.avisosResueltos>=0
+-- El numero identificativo de los componentes tiene que ser positivo (Sentido Común)
+  context Componente inv numPos:
+  self.numero > 0
 
-context Vagon inv NumeroVagonNeganivo:
-self.numero>=0
+-- No puede haber avisos resueltos negativos:
+  context Dispositivo inv avisosPos:
+  self.avisosResueltos >= 0
 
-context Vehiculo inv NumeroVehiculoNeganivo:
-self.numero>=0
+-- Las calles donde se encuentran las atracciones deben existir:
+  context Atraccion inv nombreCalle:
+  self.calle <> null
 
-context Vehiculo inv ParadaAveriaNoria:
-self.enReparacion = true implies self.noria.enMovimiento = false
+-- Todos los componentes de la montaña rusa han de ser vagones
+  context MontanyaRusa inv todoVagones
+  self.tipoComponente->forAll(v| v.oclIsTypeOf(Vagon))
 
-context Vagon inv ParadaAveriaMontanya:
-self.enReparacion = true implies self.montanya.enMovimiento = false
+-- Todos los componentes de la noria han de ser vehiculos
+  context MontanyaRusa inv todoVehiculos
+  self.tipoComponente->forAll(v| v.oclIsTypeOf(Vehiculo))
+
+-- El primer vagon no puede tener un vagon delante suyo
+  context MontanyaRusa inv anteriorPrim:
+  self.tipoComponente->first().anterior = null
+
+-- EL último vagón no puede tener otro detrás suyo
+  context MontanyaRusa inv ultimoPost:
+  self.tipoComponente->last().posterior = null
